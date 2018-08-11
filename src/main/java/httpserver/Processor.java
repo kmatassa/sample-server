@@ -64,7 +64,9 @@ public class Processor {
     } catch (Exception e) {
       deliverAnIssue(out, HttpStatus.SC_INTERNAL_SERVER_ERROR);
     } finally {
+ //     System.out.println("debug: skipping close");
       client.close();
+//      out.flush();
     }
   }
 

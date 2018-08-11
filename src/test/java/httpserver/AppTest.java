@@ -64,24 +64,28 @@ public class AppTest {
    */
   @Test
   public void shouldAnswerWithTrue() throws Exception {
+    System.out.println("----------------------");    
     int rc = this.executeGet("/helloworld.html", true);
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
   }
 
   @Test
   public void shouldAnswerWithTrueToo() throws Exception {
+    System.out.println("----------------------");    
     int rc = this.executeGet("/foo/introducing_cairngorm.pdf", false);
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
   }
 
   @Test
   public void shouldAnswerWithTrueTooToo() throws Exception {
+    System.out.println("----------------------");    
     int rc = this.executeGet("/ERROR_chrome_2018-08-01T20-43-00.756Z.png", false);
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
   }
 
   @Test
   public void shouldFailWithNotFound() throws Exception {
+    System.out.println("----------------------");    
     int rc = this.executeGet("/foo.bar", false);
     assertEquals("Should be BAD", HttpStatus.SC_NOT_FOUND, rc);
   }
@@ -105,9 +109,8 @@ public class AppTest {
         System.out.println("content length: " + entity.getContentLength());
 
         if (dumpIt) {
-          System.out.println("-----");
+          System.out.println("----- c o n t e n t ");
           System.out.println(IOUtils.toString(entity.getContent(), "UTF-8"));
-          System.out.println("-----");
         }
         else {
           InputStream in = entity.getContent();
@@ -118,11 +121,13 @@ public class AppTest {
           FileOutputStream out = new FileOutputStream(outputFile);
           IOUtils.copy(in, out);
 
-          System.out.println("-----");
+          System.out.println("----- w r i t t e n");
           System.out.println("File written to: " + outputFile);
-          System.out.println("-----");
         }
-      }
+      } else {
+        System.out.println("----- e r r o r");
+        System.out.println("status: " + status.getStatusCode());
+      }      
       EntityUtils.consume(entity);
       return status.getStatusCode();
     }

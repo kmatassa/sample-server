@@ -66,7 +66,7 @@ public class App {
           for (;;) {
             Socket client = ss.accept();
             logger.info(client.toString());
-//            System.out.println("alive: " + client.getKeepAlive());
+            System.out.println("alive: " + client.getKeepAlive());
             client.setKeepAlive(true);
 
             executorService.execute(new Runnable() {
