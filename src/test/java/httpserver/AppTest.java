@@ -111,9 +111,10 @@ public class AppTest {
         }
         else {
           InputStream in = entity.getContent();
-          File dir = new File("target/fetched");
+          File dir = new File("target" + File.separator + "fetched");
           FileUtils.forceMkdir(dir);
-          String outputFile = "target/fetched/file_" + UUID.randomUUID() + path.substring(path.lastIndexOf("."));
+          String outputFile = "target" + File.separator + "fetched" + File.separator + "file_" + UUID.randomUUID() + 
+              path.substring(path.lastIndexOf("."));
           FileOutputStream out = new FileOutputStream(outputFile);
           IOUtils.copy(in, out);
 

@@ -115,7 +115,7 @@ public class Processor {
    */
   private File getFile(final String uri) {
     File path = FileSystems.getDefault().getPath("").toAbsolutePath().toFile();
-    String httpServerRoot = "src/main/resources/files";
+    String httpServerRoot = "src" + File.separator + "main" + File.separator + "resources" + File.separator + "files";
     File dir = FileUtils.getFile(path, httpServerRoot);
     URI u = URI.create(uri);
 
