@@ -17,9 +17,11 @@ mvn mvn exec:java<CR>
 
 This will do the same, winding up with the http-server staying up so that you can make browser requests to it locally, such as:
 
-Then you can hit: http:localhost:8081/helloworld.html
-Then you can hit: http:localhost:8081/ERROR_chrome_2018-08-01T20-43-00.756Z.png
-Then you can hit: http:localhost:8081/foo/introducing_cairngorm.pdf
+Then you can hit: "http:localhost:8081/helloworld.html"
+
+Then you can hit: "http:localhost:8081/ERROR_chrome_2018-08-01T20-43-00.756Z.png"
+
+Then you can hit: "http:localhost:8081/foo/introducing_cairngorm.pdf"
 
 ctrl<C> to terminate.
 
