@@ -11,6 +11,9 @@ Assuming you have a maven client installed, it should be very simple:
 This will run the sequence of maven targets up to and including test.  Items should be installed, code check-styled, compiled and finally
 test cases that start the http-server up and execute simplified fetches against it.
 
+These test cases fetch different file types and locations, with 1 forced failure.  The html file test content is shown immediately as
+part of the test.  The others simply write the returned content into target/fetched folder for your inspection.
+
 OR,
 
 mvn mvn exec:java<CR>
@@ -27,7 +30,7 @@ ctrl<C> to terminate.
 
 ## Methodology
 
-My approach...
+My approach ...
 
 ## Shortcuts
 
