@@ -96,7 +96,25 @@
              </goals>
            </execution>
          </executions>
-       </plugin>              
+       </plugin>   
+				<plugin>
+				  <groupId>org.codehaus.mojo</groupId>
+				  <artifactId>exec-maven-plugin</artifactId>
+				  <version>1.2.1</version>
+				  <executions>
+				    <execution>
+				      <goals>
+				        <goal>java</goal>
+				      </goals>
+				    </execution>
+				  </executions>
+				  <configuration>
+				    <mainClass>httpserver.App</mainClass>
+				    <arguments>
+				      <argument>8081</argument>
+				    </arguments>
+				  </configuration>
+				</plugin>
     </plugins>
   </build>
   

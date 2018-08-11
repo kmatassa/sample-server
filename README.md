@@ -13,11 +13,15 @@ test cases that start the http-server up and execute simplified fetches against 
 
 OR,
 
-mvn integration-test<CR>
+mvn mvn exec:java<CR>
 
 This will do the same, winding up with the http-server staying up so that you can make browser requests to it locally, such as:
 
-"http:localhost:8080/helloworld.html"
+Then you can hit: http:localhost:8081/helloworld.html
+Then you can hit: http:localhost:8081/ERROR_chrome_2018-08-01T20-43-00.756Z.png
+Then you can hit: http:localhost:8081/foo/introducing_cairngorm.pdf
+
+ctrl<C> to terminate.
 
 ## Methodology
 
