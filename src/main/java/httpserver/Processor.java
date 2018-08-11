@@ -14,83 +14,111 @@ import javax.activation.MimetypesFileTypeMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpStatus;
 
+/**
+ * Processor reads a request and returns the result.
+ * @author kmatassa
+ */
 public class Processor {
-  final String CRLF = "\r\n";
-  Logger logger = Logger.getAnonymousLogger();
-  Socket client = null;
+  /**
+   * CRLF.
+   */
+  private final String crLf = "\r\n";
+  /**
+   * Local logger.
+   */
+  private Logger logger = Logger.getAnonymousLogger();
+  /**
+   * Socket connection.
+   */
+  private Socket client = null;
 
-  Processor(Socket client) {
-    this.client = client;
+  /**
+   * @param clientSocket is the socket connection to process.
+   */
+  Processor(final Socket clientSocket) {
+    this.client = clientSocket;
   }
 
-  public void process() throws IOException {
+  /**
+   * Processor accepts GET requests and delivers results.
+   * @throws IOException sometimes
+   */
+  public final void process() throws IOException {
     OutputStream out = client.getOutputStream();
     try {
       RequestParser request = new RequestParser();
       request.parse(client);
       logger.info("http-server request: " + request);
 
-      if (request.method.equalsIgnoreCase("GET")) {
+      if (request.getMethod().equalsIgnoreCase("GET")) {
         try {
           deliverAFile(out, request);
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
           deliverAnIssue(out, HttpStatus.SC_NOT_FOUND);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
           deliverAnIssue(out, HttpStatus.SC_BAD_REQUEST);
         }
-      }
-      else {
+      } else {
         deliverAnIssue(out, HttpStatus.SC_BAD_REQUEST);
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       deliverAnIssue(out, HttpStatus.SC_INTERNAL_SERVER_ERROR);
-    }
-    finally {
+    } finally {
       client.close();
     }
   }
 
-  protected void deliverAnIssue(OutputStream out, int issue) throws IOException {
-    String txt = String.format("HTTP/1.1 %d%s", issue, CRLF);
+  /**
+   * Delivers an unexpected HTTP code back to the client.
+   * @param out is the OutputStream
+   * @param issue is the Http status code to return
+   * @throws IOException sometimes
+   */
+  private void deliverAnIssue(final OutputStream out, final int issue) throws IOException {
+    String txt = String.format("HTTP/1.1 %d%s", issue, crLf);
     out.write(txt.getBytes());
   }
 
-  protected void deliverAFile(OutputStream out, RequestParser request) throws IOException {
-    File source = this.getFile(request.uri);
+  /**
+   * Delivers the request URL if possible.
+   * @param out is the OutputStream
+   * @param request is the RequestParser content
+   * @throws IOException sometimes
+   */
+  private void deliverAFile(final OutputStream out, final RequestParser request) throws IOException {
+    File source = this.getFile(request.getUri());
     if (source.exists() && source.isFile()) {
       String contentType = new MimetypesFileTypeMap().getContentType(source);
       long contentLength = source.length();
       logger.info("content-type [" + contentType + "]");
       logger.info("content-length [" + contentLength + "]");
-      String txt = String.format("HTTP/1.1 %d %sContent-Type: %s%sContent-Length: %d%s%s", HttpStatus.SC_OK, CRLF, contentType, CRLF,
-                                 contentLength, CRLF, CRLF);
+      String txt = String.format("HTTP/1.1 %d %sContent-Type: %s%sContent-Length: %d%s%s", HttpStatus.SC_OK, crLf, contentType, crLf,
+                                 contentLength, crLf, crLf);
       // Will close stream
       // out.print("Connection: close\r\n");
       try {
         out.write(txt.getBytes());
         FileUtils.copyFile(source, out);
-      }
-      catch (Error ex) {
-        logger.severe(ex.getMessage());
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         logger.severe(e.getMessage());
+        throw e;
       }
-    }
-    else {
+    } else {
       throw new FileNotFoundException();
     }
   }
 
-  File getFile(String uri) {
+  /**
+   * Crufts up a file containing the path to the resource, to be delivered as content.
+   * @param uri is the basis of where a resource may be.
+   * @return File containing the resource
+   */
+  private File getFile(final String uri) {
     File path = FileSystems.getDefault().getPath("").toAbsolutePath().toFile();
-    String httpServerRoot = "src/main/resources/files";    
+    String httpServerRoot = "src/main/resources/files";
     File dir = FileUtils.getFile(path, httpServerRoot);
     URI u = URI.create(uri);
-    
+
     return FileUtils.getFile(dir, u.getPath());
   }
 }
