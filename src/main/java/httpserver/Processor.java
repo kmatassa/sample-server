@@ -1,10 +1,13 @@
 package httpserver;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.util.logging.Logger;
@@ -44,30 +47,53 @@ public class Processor {
    * @throws IOException sometimes
    */
   public final void process() throws IOException {
+    // Get input and output streams.
+    BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
     OutputStream out = client.getOutputStream();
-    try {
+    boolean noErrors = true;
+    boolean keepAliveEnabled = true;
+    int numSocketRequests = 1;
+    // Loop on this inputStream for either 1 or more requests depending on keep-alive header.
+    do {
       RequestParser request = new RequestParser();
-      request.parse(client);
-      logger.info("http-server request: " + request);
+      try {
+        request.parse(in);
+        logger.info("http-server request: " + request);
+        // Create the extension
+        KeepAliveExtension keepAlive = new KeepAliveExtension(request);
+        // Process the extension in context with the current http request.
+        keepAlive.processKeepAliveOptions(client, numSocketRequests);
+        keepAliveEnabled = keepAlive.isKeepAliveEnabled();
 
-      if (request.getMethod().equalsIgnoreCase("GET")) {
-        try {
-          deliverAFile(out, request);
-        } catch (FileNotFoundException e) {
-          deliverAnIssue(out, HttpStatus.SC_NOT_FOUND);
-        } catch (Exception e) {
-          deliverAnIssue(out, HttpStatus.SC_BAD_REQUEST);
+        logger.info("http-server keep-alive mode: " + keepAliveEnabled
+                    + " number of requests on this socket: " + numSocketRequests++);
+        if (request.getMethod().equalsIgnoreCase("GET")) {
+          try {
+            deliverAFile(out, request, keepAlive);
+          } catch (FileNotFoundException e) {
+            deliverAnIssue(out, HttpStatus.SC_NOT_FOUND);
+            noErrors = false;
+          } catch (Exception e) {
+            deliverAnIssue(out, HttpStatus.SC_BAD_REQUEST);
+            noErrors = false;
+          }
+        } else {
+          deliverAnIssue(out, HttpStatus.SC_METHOD_NOT_ALLOWED);
+          noErrors = false;
         }
-      } else {
-        deliverAnIssue(out, HttpStatus.SC_BAD_REQUEST);
+      } catch (SocketTimeoutException e) {
+        // Keep-alive idle connection timeout.
+        noErrors = false;
+      } catch (Exception e) {
+        deliverAnIssue(out, HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        noErrors = false;
+      } finally {
+        out.flush();
       }
-    } catch (Exception e) {
-      deliverAnIssue(out, HttpStatus.SC_INTERNAL_SERVER_ERROR);
-    } finally {
- //     System.out.println("debug: skipping close");
-      client.close();
-//      out.flush();
-    }
+    } while (noErrors && keepAliveEnabled);
+    // Falling out of continuous processing either due to an error, or keep-alive is disabled, maxed, or timed-out.
+    // Force close the socket as a simplified behaviour.
+    client.close();
   }
 
   /**
@@ -85,19 +111,30 @@ public class Processor {
    * Delivers the request URL if possible.
    * @param out is the OutputStream
    * @param request is the RequestParser content
+   * @param keepAlive is the extension that affects the connection response value.
    * @throws IOException sometimes
    */
-  private void deliverAFile(final OutputStream out, final RequestParser request) throws IOException {
+  private void deliverAFile(final OutputStream out, final RequestParser request, final KeepAliveExtension keepAlive)
+      throws IOException {
     File source = this.getFile(request.getUri());
     if (source.exists() && source.isFile()) {
       String contentType = new MimetypesFileTypeMap().getContentType(source);
       long contentLength = source.length();
+
+      String connection = "Connection: close" + crLf;
+      if (keepAlive.isKeepAliveSupported()) {
+         if (keepAlive.isKeepAliveEnabled()) {
+           connection = "Connection: keep-alive" + crLf;
+         }
+      }
       logger.info("content-type [" + contentType + "]");
       logger.info("content-length [" + contentLength + "]");
-      String txt = String.format("HTTP/1.1 %d %sContent-Type: %s%sContent-Length: %d%s%s", HttpStatus.SC_OK, crLf, contentType, crLf,
-                                 contentLength, crLf, crLf);
-      // Will close stream
-      // out.print("Connection: close\r\n");
+
+      String txt = String.format("HTTP/1.1 %d %sContent-Type: %s%sContent-Length: %d%s%s%s", HttpStatus.SC_OK, crLf,
+                                 contentType, crLf,
+                                 contentLength, crLf,
+                                 connection,
+                                 crLf);
       try {
         out.write(txt.getBytes());
         FileUtils.copyFile(source, out);

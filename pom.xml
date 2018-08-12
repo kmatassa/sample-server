@@ -74,7 +74,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    
     <plugins>
        <plugin>
          <groupId>org.apache.maven.plugins</groupId>
@@ -96,7 +95,7 @@
              </goals>
            </execution>
          </executions>
-       </plugin>   
+       </plugin> 
 				<plugin>
 				  <groupId>org.codehaus.mojo</groupId>
 				  <artifactId>exec-maven-plugin</artifactId>

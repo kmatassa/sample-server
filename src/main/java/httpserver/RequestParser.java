@@ -2,8 +2,6 @@ package httpserver;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,13 +33,11 @@ public class RequestParser {
 
   /**
    * Parses the incoming request into this object for easier handling.
-   * @param client is the socket connection being processed
+   * @param in BufferedReader holding request content
    * @return String containing the method received in the request.
    * @throws IOException sometimes
    */
-  public final String parse(final Socket client) throws IOException {
-    // Get input and output streams to talk to the client
-    BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+  public final String parse(final BufferedReader in) throws IOException {
     // Note that the readLine() method works across platforms.
     readRequestLine(in);
     readRequestHeaders(in);
@@ -134,6 +130,13 @@ public class RequestParser {
    */
   public final Map<String, String> getHeaders() {
     return headers;
+  }
+
+  /**
+   * @return true if the current http request is version 1.0
+   */
+  public final boolean isHttpVersionOneO() {
+    return getVersion().contains("1.0");
   }
 
   /**
