@@ -53,10 +53,11 @@ public class Processor {
     boolean noErrors = true;
     boolean keepAliveEnabled = true;
     int numSocketRequests = 1;
-    // Loop on this inputStream for either 1 or more requests depending on keep-alive header.
+    // Loop on this inputStream for either 1 or more requests depending on keep-alive extension.
     do {
       RequestParser request = new RequestParser();
       try {
+        // May block if we are in keep-alive
         request.parse(in);
         logger.info("http-server request: " + request);
         // Create the extension
