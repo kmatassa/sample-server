@@ -11,6 +11,26 @@ import java.util.logging.Logger;
  */
 public class KeepAliveExtension {
   /**
+   * Keep-alive header value.
+   */
+  private static final String KEEP_ALIVE_TIMEOUT = "timeout";
+  /**
+   * Keep-alive header value.
+   */
+  private static final String KEEP_ALIVE_MAX = "max";
+  /**
+   * Connection keep-alive value.
+   */
+  private static final String KEEP_ALIVE_VALUE = "keep-alive";
+  /**
+   * Connection header name.
+   */
+  private static final String HDR_CONNECTION = "Connection";
+  /**
+   * Keep-alive header name.
+   */
+  private static final String HDR_KEEP_ALIVE = "Keep-Alive";
+  /**
    * Millisecs.
    */
   private static final int MS = 1000;
@@ -84,8 +104,8 @@ public class KeepAliveExtension {
    * @return true if there's a valid request for keep-alive.
    */
   private boolean hasRequestedKeepAlive() {
-    if (getRequest().getHeaders().containsKey("Connection")) {
-      return getRequest().getHeaders().get("Connection").equalsIgnoreCase("keep-alive");
+    if (getRequest().getHeaders().containsKey(HDR_CONNECTION)) {
+      return getRequest().getHeaders().get(HDR_CONNECTION).equalsIgnoreCase(KEEP_ALIVE_VALUE);
     }
     return false;
   }
@@ -94,14 +114,14 @@ public class KeepAliveExtension {
    * @return int value of max number of requests to be processed in the same connection kept alive.
    */
   private int keepAliveMaxRequests() {
-    return parseKeepAliveHeader("max");
+    return parseKeepAliveHeader(KEEP_ALIVE_MAX);
   }
 
   /**
    * @return int value in seconds of the maximum time an idle connection can live with keep-alive.
    */
   private int keepAliveTimeout() {
-    return parseKeepAliveHeader("timeout");
+    return parseKeepAliveHeader(KEEP_ALIVE_TIMEOUT);
   }
 
   /**
@@ -110,7 +130,7 @@ public class KeepAliveExtension {
    * @return requested attribute value
    */
   private int parseKeepAliveHeader(final String attr) {
-    String h = getRequest().getHeaders().get("Keep-Alive");
+    String h = getRequest().getHeaders().get(HDR_KEEP_ALIVE);
     if (h != null) {
       String[] parts = h.split("=");
       if (parts[0].equalsIgnoreCase(attr)) {

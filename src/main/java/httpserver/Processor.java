@@ -71,21 +71,21 @@ public class Processor {
           try {
             deliverAFile(out, request, keepAlive);
           } catch (FileNotFoundException e) {
-            deliverAnIssue(out, HttpStatus.SC_NOT_FOUND);
+            deliverAnIssue(out, request, HttpStatus.SC_NOT_FOUND);
             noErrors = false;
           } catch (Exception e) {
-            deliverAnIssue(out, HttpStatus.SC_BAD_REQUEST);
+            deliverAnIssue(out, request, HttpStatus.SC_BAD_REQUEST);
             noErrors = false;
           }
         } else {
-          deliverAnIssue(out, HttpStatus.SC_METHOD_NOT_ALLOWED);
+          deliverAnIssue(out, request, HttpStatus.SC_METHOD_NOT_ALLOWED);
           noErrors = false;
         }
       } catch (SocketTimeoutException e) {
         // Keep-alive idle connection timeout.
         noErrors = false;
       } catch (Exception e) {
-        deliverAnIssue(out, HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        deliverAnIssue(out, request, HttpStatus.SC_INTERNAL_SERVER_ERROR);
         noErrors = false;
       } finally {
         out.flush();
@@ -99,11 +99,12 @@ public class Processor {
   /**
    * Delivers an unexpected HTTP code back to the client.
    * @param out is the OutputStream
+   * @param request is the RequestParser content
    * @param issue is the Http status code to return
    * @throws IOException sometimes
    */
-  private void deliverAnIssue(final OutputStream out, final int issue) throws IOException {
-    String txt = String.format("HTTP/1.1 %d%s", issue, crLf);
+  private void deliverAnIssue(final OutputStream out, final RequestParser request, final int issue) throws IOException {
+    String txt = String.format("%s %d%s", request.getVersion(), issue, crLf);
     out.write(txt.getBytes());
   }
 
@@ -130,7 +131,8 @@ public class Processor {
       logger.info("content-type [" + contentType + "]");
       logger.info("content-length [" + contentLength + "]");
 
-      String txt = String.format("HTTP/1.1 %d %sContent-Type: %s%sContent-Length: %d%s%s%s", HttpStatus.SC_OK, crLf,
+      String txt = String.format("%s %d %sContent-Type: %s%sContent-Length: %d%s%s%s", request.getVersion(),
+                                 HttpStatus.SC_OK, crLf,
                                  contentType, crLf,
                                  contentLength, crLf,
                                  connection,
