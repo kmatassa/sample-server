@@ -87,7 +87,7 @@ public class AppTest {
     HttpGet httpGet = new HttpGet(thePath);
     httpGet.addHeader("Keep-Alive", "max=1");
 
-    CloseableHttpResponse response = this.httpClient.execute(httpGet);
+    CloseableHttpResponse response = AppTest.httpClient.execute(httpGet);
     HttpEntity entity = response.getEntity();
     assertEquals("Should be OK", HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
     // Should be closed
@@ -96,7 +96,7 @@ public class AppTest {
     response.close();
 
     httpGet.removeHeaders("Keep-Alive");
-    response = this.httpClient.execute(httpGet);
+    response = AppTest.httpClient.execute(httpGet);
     entity = response.getEntity();
     assertEquals("Should be OK", HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
     // Should be kept open.
@@ -112,7 +112,7 @@ public class AppTest {
     HttpGet httpGet = new HttpGet(thePath);
     httpGet.addHeader("Keep-Alive", "timeout=1");
 
-    CloseableHttpResponse response = this.httpClient.execute(httpGet);
+    CloseableHttpResponse response = AppTest.httpClient.execute(httpGet);
     HttpEntity entity = response.getEntity();
     assertEquals("Should be OK", HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
     // Should be closed
@@ -176,7 +176,7 @@ public class AppTest {
     System.out.println("----------------------");    
     String thePath = getBaseUrl() + "/foo.bar";
     HttpPost httpPost = new HttpPost(thePath);    
-    CloseableHttpResponse response = this.httpClient.execute(httpPost);
+    CloseableHttpResponse response = AppTest.httpClient.execute(httpPost);
     try {
       StatusLine status = response.getStatusLine();
       assertEquals("Should be BAD", HttpStatus.SC_NOT_IMPLEMENTED, status.getStatusCode());      
@@ -199,7 +199,7 @@ public class AppTest {
     if (connectionHeader.contains("close")) {
       httpMethod.addHeader("Connection", "close");
     }    
-    CloseableHttpResponse response = this.httpClient.execute(httpMethod);
+    CloseableHttpResponse response = AppTest.httpClient.execute(httpMethod);
     try {
       StatusLine status = response.getStatusLine();
       HttpEntity entity = response.getEntity();
