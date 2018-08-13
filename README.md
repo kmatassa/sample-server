@@ -42,12 +42,12 @@ Junit test cases have been built to illustrate functionality and are being run v
 - keepAliveWithHttp1_1_is_supported_but_disabled_by_client - illustrates client override to disable
 - keepAliveWithHttp1_0_is_not_supported - illustrates 1.0 is not a supported version for keep-alive
 
-OR,
+Or,
 
 You can run the app standalone and use a browser to make basic file request.
 
 ```
-mvn mvn exec:java
+mvn exec:java
 ```
 
 This will invoke the App main which will then pause waiting for HTTP request to service.  You can then try:
