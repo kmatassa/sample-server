@@ -19,9 +19,10 @@ test cases that start the http-server up and execute simplified fetches against 
 
 ### Inspect test results
 
+
 shouldAnswerWithDisplayedContent - Displays an html result
 shouldAnswerWithPDFContentInSubDirectory - Downloads a PDF from a nested subdirectory
-shouldAnswerWithPNGContent - Downloads a PNG 
+shouldAnswerWithPNGContent - Downloads a PNG
 shouldFailWithNotFound - Returns an expected error for a non-existing file
 shouldFailWithMethodNotAllowed - Returns an expected error for invalid operation
 
