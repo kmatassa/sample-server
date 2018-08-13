@@ -19,17 +19,16 @@ test cases that start the http-server up and execute simplified fetches against 
 
 ### Inspect test results
 
+- shouldAnswerWithDisplayedContent - Displays an html result
+- shouldAnswerWithPDFContentInSubDirectory - Downloads a PDF from a nested subdirectory
+- shouldAnswerWithPNGContent - Downloads a PNG
+- shouldFailWithNotFound - Returns an expected error for a non-existing file
+- shouldFailWithMethodNotAllowed - Returns an expected error for invalid operation
 
-shouldAnswerWithDisplayedContent - Displays an html result
-shouldAnswerWithPDFContentInSubDirectory - Downloads a PDF from a nested subdirectory
-shouldAnswerWithPNGContent - Downloads a PNG
-shouldFailWithNotFound - Returns an expected error for a non-existing file
-shouldFailWithMethodNotAllowed - Returns an expected error for invalid operation
-
-keepAliveWithHttp1_1_is_supported - illustrates keep-alive keeps socket open
-keepAliveWithHttp1_1_is_supported_but_limited_to_2_max_by_client - illustrates keep-alive max parameter
-keepAliveWithHttp1_1_is_supported_but_disabled_by_client - illustrates client override to disable
-keepAliveWithHttp1_0_is_not_supported - illustrates 1.0 is not a supported version for keep-alive
+- keepAliveWithHttp1_1_is_supported - illustrates keep-alive keeps socket open
+- keepAliveWithHttp1_1_is_supported_but_limited_to_2_max_by_client - illustrates keep-alive max parameter
+- keepAliveWithHttp1_1_is_supported_but_disabled_by_client - illustrates client override to disable
+- keepAliveWithHttp1_0_is_not_supported - illustrates 1.0 is not a supported version for keep-alive
 
 OR,
 
@@ -62,9 +61,9 @@ the suite initializes first with spinning up the server and then subsequently ru
 
 I utilized the following libraries:
 
-https://commons.apache.org/proper/commons-io/ - For file and string manipulation
-https://hc.apache.org/httpcomponents-client-ga/index.html - For httpClient
-http://hc.apache.org/httpcomponents-core-ga/ - For HttpRequestLine and headers
-https://junit.org/junit5/docs/current/api/overview-summary.html - Junit support
+- https://commons.apache.org/proper/commons-io/ - For file and string manipulation.
+- https://hc.apache.org/httpcomponents-client-ga/index.html - For httpClient
+- http://hc.apache.org/httpcomponents-core-ga/ - For HttpRequestLine and headers
+- https://junit.org/junit5/docs/current/api/overview-summary.html - Junit support
 
 
