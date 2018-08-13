@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 /**
- * A http-server sample.
+ * A http-server sample, that utilizes a fixed-length thread pool to service HTTP requests.
  * @author kmatassa
  */
 public class App {

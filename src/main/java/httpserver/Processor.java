@@ -21,7 +21,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpStatus;
 
 /**
- * Processor reads a request and returns the result.
+ * Processor reads HTTP requests and where possible delivers file-based content.  It supports GET and HEAD requests.  It supports
+ * Keep-Alive as well, and thus multiple HTTP requests may be serviced continuously on the same socket.
  * @author kmatassa
  */
 public class Processor {

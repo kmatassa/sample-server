@@ -5,7 +5,7 @@ import java.net.SocketException;
 import java.util.logging.Logger;
 
 /**
- * Performs basic support for keep-alive functionality, by looking for the enablement of the feature,
+ * Encapsulates and performs support for keep-alive functionality, by looking for the enablement of the feature,
  * and looking for the associated options for tuning the max number of requests or idle connection timeout.
  * @author kmatassa
  */
