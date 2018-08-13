@@ -120,6 +120,7 @@ public class Processor {
       throws IOException {
     File source = this.getFile(request.getUri());
     if (source.exists() && source.isFile()) {
+      // Rely on activation library to determine the content type.
       String contentType = new MimetypesFileTypeMap().getContentType(source);
       long contentLength = source.length();
 

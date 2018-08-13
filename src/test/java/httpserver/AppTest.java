@@ -59,7 +59,7 @@ public class AppTest {
    * Rigorous Test :-)
    */
   @Test
-  public void shouldAnswerWithTrue() throws Exception {
+  public void shouldAnswerWithDisplayedContent() throws Exception {
     System.out.println("----------------------");    
     int rc = this.executeGet(HttpVersion.HTTP_1_1, "/helloworld.html", true, "keep-alive");
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
@@ -123,7 +123,7 @@ public class AppTest {
   }  
 
   @Test
-  public void shouldFetchWithPDFContentInSubDirectory() throws Exception {
+  public void shouldAnswerWithPDFContentInSubDirectory() throws Exception {
     System.out.println("----------------------");    
     int rc = this.executeGet(HttpVersion.HTTP_1_1, "/foo/introducing_cairngorm.pdf", false, "keep-alive");
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);

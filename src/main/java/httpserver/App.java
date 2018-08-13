@@ -57,7 +57,9 @@ public class App {
    * This allows the unit tests to execute after starting http-server.
    */
   private static void run() {
+    // Rely on executor service to create and re-use fixed number of threads.
     ExecutorService executorService = Executors.newFixedThreadPool(MAXTHREADS);
+    // Single disconnect thread.
     new Thread() {
       public void run() {
         ServerSocket ss = null;
@@ -66,6 +68,7 @@ public class App {
           for (;;) {
             Socket client = ss.accept();
             logger.info(client.toString());
+            // Thread pooled
             executorService.execute(new Runnable() {
               public void run() {
                 logger.info("Servicing on thread: [" + Thread.currentThread() + "]");
