@@ -1,8 +1,9 @@
 # http-server 
 
-This is a sample thread-pooled http server, very simplified to only service GET requests to static files found in this repository.  
+This is a sample thread-pooled http server, simplified to only service Get & Head requests to static files found in this repository.  Requests given to threads 
+that are managed via a thread pool fixed in size to 10 threads.
 
-It also has a Keep-Alive extension that implements this functionality with some limitations.  It specifically is enabled for:
+It also has the optional implementation of a  Keep-Alive extension that implements this functionality with some limitations.  It specifically is enabled for:
 
 - http 1.1
 - max request optional
@@ -15,16 +16,20 @@ It works on Windows and Mac.
 - http://www.oracle.com/technetwork/java/index.html
 - https://maven.apache.org
 
-## Run it.
+## Run it
 
 Assuming you have a maven client installed, it should be very simple:
 
-1. mvn test<CR>
+```
+mvn test
+```
 
 This will run the sequence of maven targets up to and including test.  Items should be installed, code check-styled, compiled and finally
 test cases that start the http-server up and execute simplified fetches against it.
 
 ### Inspect test results
+
+Junit test cases have been built to illustrate functionality and are being run via the "test" goal from the surefire plugin.
 
 - shouldAnswerWithDisplayedContent - Displays an html result
 - shouldAnswerWithPDFContentInSubDirectory - Downloads a PDF from a nested subdirectory
@@ -32,7 +37,6 @@ test cases that start the http-server up and execute simplified fetches against 
 - shouldFailWithNotFound - Returns an expected error for a non-existing file
 - shouldFailWithMethodNotAllowed - Returns an expected error for invalid operation
 - shouldAnswerWithHEADinfo - Returns head only information
-
 - keepAliveWithHttp1_1_is_supported - illustrates keep-alive keeps socket open
 - keepAliveWithHttp1_1_is_supported_but_limited_to_2_max_by_client - illustrates keep-alive max parameter
 - keepAliveWithHttp1_1_is_supported_but_disabled_by_client - illustrates client override to disable
@@ -40,21 +44,24 @@ test cases that start the http-server up and execute simplified fetches against 
 
 OR,
 
-mvn mvn exec:java<CR>
+You can run the app standalone and use a browser to make basic file request.
 
-This will do the same, winding up with the http-server staying up so that you can make browser requests to it locally, such as:
+```
+mvn mvn exec:java
+```
 
-Then you can hit: "http:localhost:8081/helloworld.html" (includes a nested image file)
+This will invoke the App main which will then pause waiting for HTTP request to service.  You can then try:
 
-Then you can hit: "http:localhost:8081/ERROR_chrome_2018-08-01T20-43-00.756Z.png"
+- hit: "http:localhost:8081/helloworld.html" (includes a nested image file)
+- hit: "http:localhost:8081/ERROR_chrome_2018-08-01T20-43-00.756Z.png"
+- hit: "http:localhost:8081/foo/introducing_cairngorm.pdf"
 
-Then you can hit: "http:localhost:8081/foo/introducing_cairngorm.pdf"
-
-ctrl<C> to terminate.
+Press ctrl-C to terminate.
 
 ## Methodology
 
-I've created a sample http-server.  My approach was as follows:
+I've created a sample http-server only.  My approach was to not use too many high level libraries, but use a few where
+it makes sense in that the details at that level may not be as important.
 
 - start
   - spin 1 thread to start processing loop with socket wait
@@ -62,8 +69,8 @@ I've created a sample http-server.  My approach was as follows:
       - use a fixed size thread pool to service each request
         - within a request, service either just 1 or multiple HTTP requests based on keep-alive
 
-This seems to work both either in standalone mode where one manually hits the server as described above, or as part of the test suite where
-the suite initializes first with spinning up the server and then subsequently running tests.
+This supports both cases where the application is being run in standalone mode where one manually hits the server as described above, 
+or as part of the test suite where the test suite initializes by starting the server and follows this by executing the suite.
 
 ## Shortcuts
 
@@ -73,5 +80,6 @@ I utilized the following libraries:
 - https://hc.apache.org/httpcomponents-client-ga/index.html - For httpClient
 - http://hc.apache.org/httpcomponents-core-ga/ - For HttpRequestLine and headers
 - https://junit.org/junit5/docs/current/api/overview-summary.html - Junit support
+- https://docs.oracle.com/javase/7/docs/api/javax/activation/package-summary.html - For mimetypes
 
 
