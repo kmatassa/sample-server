@@ -78,7 +78,7 @@ public class KeepAliveExtension {
       setKeepAliveEnabled(hasRequestedKeepAlive());
       // Further conditions to disable keep-alive is based on # requests, or timeout duration of idle.
       if (isKeepAliveEnabled()) {
-        if (keepAliveMaxRequests() > 0 && numSocketRequests > keepAliveMaxRequests()) {
+        if (keepAliveMaxRequests() > 0 && numSocketRequests >= keepAliveMaxRequests()) {
           setKeepAliveEnabled(false);
         } else {
           int keepAliveTimeout = keepAliveTimeout();

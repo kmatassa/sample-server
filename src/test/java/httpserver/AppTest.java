@@ -78,6 +78,31 @@ public class AppTest {
   }  
   
   @Test
+  public void keepAliveWithHttp1_1_is_supported_but_limited_to_2_max_by_client() throws Exception {
+    System.out.println("----------------------");
+    String thePath = getBaseUrl() + "/smiley.gif";
+    HttpGet httpGet = new HttpGet(thePath);
+    httpGet.addHeader("Keep-Alive", "max=1");
+
+    CloseableHttpResponse response = this.httpClient.execute(httpGet);
+    HttpEntity entity = response.getEntity();
+    assertEquals("Should be OK", HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+    // Should be closed
+    assertTrue("header connection", response.getFirstHeader("Connection").getValue().contains("close"));
+    EntityUtils.consume(entity);
+    response.close();
+
+    httpGet.removeHeaders("Keep-Alive");
+    response = this.httpClient.execute(httpGet);
+    entity = response.getEntity();
+    assertEquals("Should be OK", HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+    // Should be kept open.
+    assertTrue("header connection", response.getFirstHeader("Connection").getValue().contains("keep-alive"));
+    EntityUtils.consume(entity);
+    response.close();
+  }
+  
+  @Test
   public void keepAliveWithHttp1_1_is_supported_but_disabled_by_client() throws Exception {
     System.out.println("----------------------");  
     // Look for in LOG:
