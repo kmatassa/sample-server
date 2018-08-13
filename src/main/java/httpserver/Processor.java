@@ -10,6 +10,9 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.nio.file.FileSystems;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Logger;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -59,27 +62,33 @@ public class Processor {
       try {
         // May block if we are in keep-alive
         request.parse(in);
-        logger.info("http-server request: " + request);
-        // Create the extension
-        KeepAliveExtension keepAlive = new KeepAliveExtension(request);
-        // Process the extension in context with the current http request.
-        keepAlive.processKeepAliveOptions(client, numSocketRequests);
-        keepAliveEnabled = keepAlive.isKeepAliveEnabled();
+        if (request.hasValidHeaders()) {
+          logger.info("http-server request: " + request);
+          // Create the extension
+          KeepAliveExtension keepAlive = new KeepAliveExtension(request);
+          // Process the extension in context with the current http request.
+          keepAlive.processKeepAliveOptions(client, numSocketRequests);
+          keepAliveEnabled = keepAlive.isKeepAliveEnabled();
 
-        logger.info("http-server keep-alive mode: " + keepAliveEnabled
-                    + " number of requests on this socket: " + numSocketRequests++);
-        if (request.getMethod().equalsIgnoreCase("GET")) {
-          try {
-            deliverAFile(out, request, keepAlive);
-          } catch (FileNotFoundException e) {
-            deliverAnIssue(out, request, HttpStatus.SC_NOT_FOUND);
-            noErrors = false;
-          } catch (Exception e) {
-            deliverAnIssue(out, request, HttpStatus.SC_BAD_REQUEST);
+          logger.info("http-server keep-alive mode: " + keepAliveEnabled
+                      + " number of requests on this socket: " + numSocketRequests++);
+          // Minimum methods
+          if (request.getMethod().equalsIgnoreCase("GET") || request.getMethod().equalsIgnoreCase("HEAD")) {
+            try {
+              deliverAFile(out, request, keepAlive);
+            } catch (FileNotFoundException e) {
+              deliverAnIssue(out, request, HttpStatus.SC_NOT_FOUND);
+              noErrors = false;
+            } catch (Exception e) {
+              deliverAnIssue(out, request, HttpStatus.SC_BAD_REQUEST);
+              noErrors = false;
+            }
+          } else {
+            deliverAnIssue(out, request, HttpStatus.SC_NOT_IMPLEMENTED);
             noErrors = false;
           }
         } else {
-          deliverAnIssue(out, request, HttpStatus.SC_METHOD_NOT_ALLOWED);
+          deliverAnIssue(out, request, HttpStatus.SC_BAD_REQUEST);
           noErrors = false;
         }
       } catch (SocketTimeoutException e) {
@@ -123,7 +132,7 @@ public class Processor {
       // Rely on activation library to determine the content type.
       String contentType = new MimetypesFileTypeMap().getContentType(source);
       long contentLength = source.length();
-
+      String date = DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now(ZoneOffset.UTC));
       String connection = "Connection: close" + crLf;
       if (keepAlive.isKeepAliveSupported()) {
          if (keepAlive.isKeepAliveEnabled()) {
@@ -132,16 +141,21 @@ public class Processor {
       }
       logger.info("content-type [" + contentType + "]");
       logger.info("content-length [" + contentLength + "]");
+      logger.info("Date: [" + date + "]");
 
-      String txt = String.format("%s %d %sContent-Type: %s%sContent-Length: %d%s%s%s", request.getVersion(),
+      String txt = String.format("%s %d %sContent-Type: %s%sContent-Length: %d%s%sDate: %s%s%s", request.getVersion(),
                                  HttpStatus.SC_OK, crLf,
                                  contentType, crLf,
                                  contentLength, crLf,
                                  connection,
+                                 date, crLf,
                                  crLf);
       try {
         out.write(txt.getBytes());
-        FileUtils.copyFile(source, out);
+        // Only deliver content for GET.
+        if (request.getMethod().equalsIgnoreCase("GET")) {
+          FileUtils.copyFile(source, out);
+        }
       } catch (Exception e) {
         logger.severe(e.getMessage());
         throw e;

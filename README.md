@@ -31,6 +31,7 @@ test cases that start the http-server up and execute simplified fetches against 
 - shouldAnswerWithPNGContent - Downloads a PNG
 - shouldFailWithNotFound - Returns an expected error for a non-existing file
 - shouldFailWithMethodNotAllowed - Returns an expected error for invalid operation
+- shouldAnswerWithHEADinfo - Returns head only information
 
 - keepAliveWithHttp1_1_is_supported - illustrates keep-alive keeps socket open
 - keepAliveWithHttp1_1_is_supported_but_limited_to_2_max_by_client - illustrates keep-alive max parameter

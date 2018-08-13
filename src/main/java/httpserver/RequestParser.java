@@ -2,8 +2,12 @@ package httpserver;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import org.apache.http.Header;
 import org.apache.http.RequestLine;
@@ -26,6 +30,10 @@ public class RequestParser {
    * Http protocol version.
    */
   private String version;
+  /**
+   * Local logger.
+   */
+  private Logger logger = Logger.getAnonymousLogger();
   /**
    * Map of Http headers.
    */
@@ -73,6 +81,25 @@ public class RequestParser {
       Header p = BasicLineParser.parseHeader(line, new BasicLineParser());
       this.getHeaders().put(p.getName(), p.getValue());
     }
+  }
+
+  /**
+   * @return true if expected headers are present.
+   * @throws MalformedURLException sometimes
+   * @throws URISyntaxException sometimes
+   */
+  public final boolean hasValidHeaders() throws MalformedURLException, URISyntaxException {
+    if (this.isHttpVersionOneOne()) {
+      String host = this.getHeaders().get("Host");
+      if (host == null) {
+        logger.warning("bad request: missing Host");
+        // Well formed check.
+      } else {
+        new URI(host);
+        return true;
+      }
+    }
+    return true;
   }
 
   /* (non-Javadoc)
@@ -137,6 +164,13 @@ public class RequestParser {
    */
   public final boolean isHttpVersionOneO() {
     return getVersion().contains("1.0");
+  }
+
+  /**
+   * @return true if the current http request is version 1.1
+   */
+  public final boolean isHttpVersionOneOne() {
+    return getVersion().contains("1.1");
   }
 
   /**

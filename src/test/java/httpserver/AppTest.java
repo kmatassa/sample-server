@@ -1,6 +1,7 @@
 package httpserver;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -18,7 +19,9 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -61,7 +64,7 @@ public class AppTest {
   @Test
   public void shouldAnswerWithDisplayedContent() throws Exception {
     System.out.println("----------------------");    
-    int rc = this.executeGet(HttpVersion.HTTP_1_1, "/helloworld.html", true, "keep-alive");
+    int rc = this.executeGet(HttpVersion.HTTP_1_1, "GET", "/helloworld.html", true, "keep-alive");
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
   }
   
@@ -71,9 +74,9 @@ public class AppTest {
     // Look for in LOG:
     // INFO: http-server keep-alive mode: true number of requests on this socket: 2     
     // Note also, other tests that still use keep-alive enabled, will increase this socket count accordingly...
-    int rc = this.executeGet(HttpVersion.HTTP_1_1, "/helloworld.html", false, "keep-alive");
+    int rc = this.executeGet(HttpVersion.HTTP_1_1, "GET", "/helloworld.html", false, "keep-alive");
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
-    rc = this.executeGet(HttpVersion.HTTP_1_1, "/smiley.gif", false, "keep-alive");    
+    rc = this.executeGet(HttpVersion.HTTP_1_1, "GET", "/smiley.gif", false, "keep-alive");    
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
   }  
   
@@ -107,9 +110,9 @@ public class AppTest {
     System.out.println("----------------------");  
     // Look for in LOG:
     // INFO: http-server keep-alive mode: true number of requests on this socket: 1     
-    int rc = this.executeGet(HttpVersion.HTTP_1_1, "/helloworld.html", false, "close");
+    int rc = this.executeGet(HttpVersion.HTTP_1_1, "GET", "/helloworld.html", false, "close");
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
-    rc = this.executeGet(HttpVersion.HTTP_1_1, "/smiley.gif", false, "close");    
+    rc = this.executeGet(HttpVersion.HTTP_1_1, "GET", "/smiley.gif", false, "close");    
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
   }  
  
@@ -118,30 +121,37 @@ public class AppTest {
     System.out.println("----------------------");  
     // THIS IS FOR DEMO PURPOSES.  "http-server" doesn't support keep-alive with 1.0.
     // "close" indicates the server has closed the socket.
-    int rc = this.executeGet(HttpVersion.HTTP_1_0, "/helloworld.html", false, "close");
+    int rc = this.executeGet(HttpVersion.HTTP_1_0, "GET", "/helloworld.html", false, "close");
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
   }  
 
   @Test
   public void shouldAnswerWithPDFContentInSubDirectory() throws Exception {
     System.out.println("----------------------");    
-    int rc = this.executeGet(HttpVersion.HTTP_1_1, "/foo/introducing_cairngorm.pdf", false, "keep-alive");
+    int rc = this.executeGet(HttpVersion.HTTP_1_1, "GET", "/foo/introducing_cairngorm.pdf", false, "keep-alive");
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
   }
 
   @Test
   public void shouldAnswerWithPNGContent() throws Exception {
     System.out.println("----------------------");    
-    int rc = this.executeGet(HttpVersion.HTTP_1_1, "/ERROR_chrome_2018-08-01T20-43-00.756Z.png", false, "keep-alive");
+    int rc = this.executeGet(HttpVersion.HTTP_1_1, "GET", "/ERROR_chrome_2018-08-01T20-43-00.756Z.png", false, "keep-alive");
     assertEquals("Should be OK", HttpStatus.SC_OK, rc);
   }
 
   @Test
   public void shouldFailWithNotFound() throws Exception {
     System.out.println("----------------------");    
-    int rc = this.executeGet(HttpVersion.HTTP_1_1, "/foo.bar", false, "keep-alive");
+    int rc = this.executeGet(HttpVersion.HTTP_1_1, "GET", "/foo.bar", false, "keep-alive");
     assertEquals("Should be BAD", HttpStatus.SC_NOT_FOUND, rc);
   }
+  
+  @Test
+  public void shouldAnswerWithHEADinfo() throws Exception {
+    System.out.println("----------------------");    
+    int rc = this.executeGet(HttpVersion.HTTP_1_1, "HEAD", "/ERROR_chrome_2018-08-01T20-43-00.756Z.png", false, "keep-alive");
+    assertEquals("Should be OK", HttpStatus.SC_OK, rc);
+  }  
 
   @Test
   public void shouldFailWithMethodNotAllowed() throws Exception {
@@ -151,7 +161,7 @@ public class AppTest {
     CloseableHttpResponse response = this.httpClient.execute(httpPost);
     try {
       StatusLine status = response.getStatusLine();
-      assertEquals("Should be BAD", HttpStatus.SC_METHOD_NOT_ALLOWED, status.getStatusCode());      
+      assertEquals("Should be BAD", HttpStatus.SC_NOT_IMPLEMENTED, status.getStatusCode());      
     }
     finally {
       response.close();
@@ -162,15 +172,16 @@ public class AppTest {
     return ("http://localhost:" + port);
   }
 
-  private int executeGet(HttpVersion version, String path, boolean dumpIt, String connectionHeader) 
+  private int executeGet(HttpVersion version, String method, String path, boolean dumpIt, String connectionHeader) 
       throws ClientProtocolException, IOException {
     String thePath = getBaseUrl() + path;
-    HttpGet httpGet = new HttpGet(thePath);
-    httpGet.setProtocolVersion(version);
+    
+    HttpRequestBase httpMethod = (HttpRequestBase)(method.equalsIgnoreCase("GET") ? new HttpGet(thePath) : new HttpHead(thePath));    
+    httpMethod.setProtocolVersion(version);
     if (connectionHeader.contains("close")) {
-      httpGet.addHeader("Connection", "close");
+      httpMethod.addHeader("Connection", "close");
     }    
-    CloseableHttpResponse response = this.httpClient.execute(httpGet);
+    CloseableHttpResponse response = this.httpClient.execute(httpMethod);
     try {
       StatusLine status = response.getStatusLine();
       HttpEntity entity = response.getEntity();
@@ -178,10 +189,15 @@ public class AppTest {
       System.out.println("using protocol version: " + version);
       System.out.println("fetching: " + path);
       if (status.getStatusCode() == HttpStatus.SC_OK) {
-        System.out.println("content type: " + entity.getContentType());
-        System.out.println("content length: " + entity.getContentLength());      
         System.out.println("connection: " + response.getFirstHeader("Connection").getValue());
-        
+        System.out.println("Date: " + response.getFirstHeader("Date").getValue());
+        if (method.equalsIgnoreCase("GET")) {
+          System.out.println("content type: " + entity.getContentType());
+          System.out.println("content length: " + entity.getContentLength());
+        } else {
+          assertNull("should be null", entity);
+          return status.getStatusCode();
+        }                
         // Validate the http-server has indicated that the socket has been closed via the header value.
         if (connectionHeader != null) {
           assertTrue("header connection", response.getFirstHeader("Connection").getValue().contains(connectionHeader));
