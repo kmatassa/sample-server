@@ -8,6 +8,13 @@ It also has a Keep-Alive extension that implements this functionality with some 
 - max request optional
 - timeout on idle optional 
 
+It works on Windows and Mac.
+
+## Prerequisites
+
+- http://www.oracle.com/technetwork/java/index.html
+- https://maven.apache.org
+
 ## Run it.
 
 Assuming you have a maven client installed, it should be very simple:
