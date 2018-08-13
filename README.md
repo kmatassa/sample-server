@@ -61,7 +61,7 @@ Press ctrl-C to terminate.
 ## Methodology
 
 I've created a sample http-server only.  My approach was to not use too many high level libraries, but use a few where
-it makes sense in that the details at that level may not be as important.
+it makes sense where illustration is not as beneficial.
 
 - start
   - spin 1 thread to start processing loop with socket wait
