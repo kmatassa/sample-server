@@ -94,6 +94,7 @@ public class Processor {
       } catch (SocketTimeoutException e) {
         // Keep-alive idle connection timeout.
         noErrors = false;
+        logger.info("socket timed-out, closing...");
       } catch (Exception e) {
         deliverAnIssue(out, request, HttpStatus.SC_INTERNAL_SERVER_ERROR);
         noErrors = false;

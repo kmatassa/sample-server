@@ -106,6 +106,24 @@ public class AppTest {
   }
   
   @Test
+  public void keepAliveWithHttp1_1_is_supported_but_limited_to_timeout() throws Exception {
+    System.out.println("----------------------");
+    String thePath = getBaseUrl() + "/smiley.gif";
+    HttpGet httpGet = new HttpGet(thePath);
+    httpGet.addHeader("Keep-Alive", "timeout=1");
+
+    CloseableHttpResponse response = this.httpClient.execute(httpGet);
+    HttpEntity entity = response.getEntity();
+    assertEquals("Should be OK", HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+    // Should be closed
+    assertTrue("header connection", response.getFirstHeader("Connection").getValue().contains("keep-alive"));
+    EntityUtils.consume(entity);
+    response.close();      
+    Thread.sleep(3000);
+    // Check logs.
+  }
+  
+  @Test
   public void keepAliveWithHttp1_1_is_supported_but_disabled_by_client() throws Exception {
     System.out.println("----------------------");  
     // Look for in LOG:

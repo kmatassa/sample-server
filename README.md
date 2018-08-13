@@ -41,6 +41,7 @@ Junit test cases have been built to illustrate functionality and are being run v
 - keepAliveWithHttp1_1_is_supported_but_limited_to_2_max_by_client - illustrates keep-alive max parameter
 - keepAliveWithHttp1_1_is_supported_but_disabled_by_client - illustrates client override to disable
 - keepAliveWithHttp1_0_is_not_supported - illustrates 1.0 is not a supported version for keep-alive
+- keepAliveWithHttp1_1_is_supported_but_limited_to_timeout - illustrates keep-alive timeout parameter
 
 Or,
 

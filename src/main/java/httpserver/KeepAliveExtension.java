@@ -89,6 +89,7 @@ public class KeepAliveExtension {
               int to = keepAliveTimeout * MS;
               // Only if changed.
               if (client.getSoTimeout() != to) {
+                logger.info("keep-alive timeout set to: " + keepAliveTimeout * MS);
                 client.setSoTimeout(keepAliveTimeout * MS);
               }
             } else {
