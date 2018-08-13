@@ -207,12 +207,11 @@ public class AppTest {
       System.out.println("using protocol version: " + version);
       System.out.println("fetching: " + path);
       if (status.getStatusCode() == HttpStatus.SC_OK) {
-        System.out.println("connection: " + response.getFirstHeader("Connection").getValue());
+        System.out.println("Connection: " + response.getFirstHeader("Connection").getValue());
         System.out.println("Date: " + response.getFirstHeader("Date").getValue());
-        if (method.equalsIgnoreCase("GET")) {
-          System.out.println("content type: " + entity.getContentType());
-          System.out.println("content length: " + entity.getContentLength());
-        } else {
+        System.out.println("Content Type: " + response.getFirstHeader("Content-Type").getValue());
+        System.out.println("Content Length: " + response.getFirstHeader("Content-Length").getValue());
+        if (method.equalsIgnoreCase("HEAD")) {
           assertNull("should be null", entity);
           return status.getStatusCode();
         }                
