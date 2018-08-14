@@ -76,10 +76,18 @@ or as part of the test suite where the test suite initializes by starting the se
 
 ## Javadoc
 
-If desired, it will be produced in the /target/site/apidocs folder.
+If desired, they will be produced in the /target/site/apidocs folder.
 
 ```
 mvn javadoc:javadoc
+```
+
+## Surefire report
+
+If desired, it will be produced in the /target/site folder.
+
+```
+mvn surefire-report:report
 ```
 
 ## Shortcuts
