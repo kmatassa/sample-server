@@ -66,10 +66,10 @@ I've created a sample http-server only.  My approach was to not use too many hig
 it makes sense where illustration is not as beneficial.
 
 - start
-  - spin 1 thread to start processing loop with socket wait
-    - for each request
-      - use a fixed size thread pool to service each request
-        - within a request, service either just 1 or multiple HTTP requests based on keep-alive
+  - spin 1 thread to start http-server's processing loop with a socket wait
+    - for each incoming connection 
+      - utilize a thread to service, instances of which are managed using a fixed size thread pool  
+        - service 1 or multiple HTTP requests based on keep-alive
 
 This supports both cases where the application is being run in standalone mode where one manually hits the server as described above, 
 or as part of the test suite where the test suite initializes by starting the server and follows this by executing the suite.
