@@ -9,7 +9,7 @@ It also has the optional implementation of a  Keep-Alive extension that implemen
 - max request optional
 - timeout on idle optional 
 
-It works on Windows and Mac.
+http-server works on Windows and Mac.
 
 ## Prerequisites
 
