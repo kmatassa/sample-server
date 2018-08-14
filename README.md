@@ -27,14 +27,6 @@ mvn test
 This will run the sequence of maven targets up to and including test.  Items should be installed, code check-styled, compiled and finally
 test cases that start the http-server up and execute simplified fetches against it.
 
-### Javadoc
-
-If desired, it will be produced in the /target/site folder.
-
-```
-mvn surefire-report:report  
-```
-
 ### Inspect test results
 
 Junit test cases have been built to illustrate functionality and are being run via the "test" goal from the surefire plugin.
@@ -89,7 +81,6 @@ If desired, it will be produced in the /target/site/apidocs folder.
 ```
 mvn javadoc:javadoc
 ```
-
 
 ## Shortcuts
 
