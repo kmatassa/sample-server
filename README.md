@@ -36,6 +36,7 @@ Junit test cases have been built to illustrate functionality and are being run v
 - shouldAnswerWithPNGContent - Downloads a PNG
 - shouldFailWithNotFound - Returns an expected error for a non-existing file
 - shouldFailWithMethodNotAllowed - Returns an expected error for invalid operation
+- shouldFailWithBlockedSecurityCheck - Returns an expected error for paths that seek past server root
 - shouldAnswerWithHEADinfo - Returns head only information
 - keepAliveWithHttp1_1_is_supported - illustrates keep-alive keeps socket open
 - keepAliveWithHttp1_1_is_supported_but_limited_to_2_max_by_client - illustrates keep-alive max parameter

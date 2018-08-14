@@ -19,6 +19,8 @@ import javax.activation.MimetypesFileTypeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 
 /**
  * Processor reads HTTP requests and where possible delivers file-based content.  It supports GET and HEAD requests.  It supports
@@ -74,7 +76,7 @@ public class Processor {
           logger.info("http-server keep-alive mode: " + keepAliveEnabled
                       + " number of requests on this socket: " + numSocketRequests++);
           // Minimum methods
-          if (request.getMethod().equalsIgnoreCase("GET") || request.getMethod().equalsIgnoreCase("HEAD")) {
+          if (request.getMethod().equals(HttpGet.METHOD_NAME) || request.getMethod().equals(HttpHead.METHOD_NAME)) {
             try {
               deliverAFile(out, request, keepAlive);
             } catch (FileNotFoundException e) {
@@ -155,7 +157,7 @@ public class Processor {
       try {
         out.write(txt.getBytes());
         // Only deliver content for GET.
-        if (request.getMethod().equalsIgnoreCase("GET")) {
+        if (request.getMethod().equals(HttpGet.METHOD_NAME)) {
           FileUtils.copyFile(source, out);
         }
       } catch (Exception e) {
@@ -171,13 +173,19 @@ public class Processor {
    * Crufts up a file containing the path to the resource, to be delivered as content.
    * @param uri is the basis of where a resource may be.
    * @return File containing the resource
+   * @throws IOException sometimes
    */
-  private File getFile(final String uri) {
+  private File getFile(final String uri) throws IOException {
     File path = FileSystems.getDefault().getPath("").toAbsolutePath().toFile();
     String httpServerRoot = "src" + File.separator + "main" + File.separator + "resources" + File.separator + "files";
     File dir = FileUtils.getFile(path, httpServerRoot);
     URI u = URI.create(uri);
 
-    return FileUtils.getFile(dir, u.getPath());
+    File resourceFileRequested = FileUtils.getFile(dir, u.getPath());
+    if (!resourceFileRequested.getCanonicalPath().startsWith(dir.getCanonicalPath())) {
+      logger.warning("Suspicious request, skipping: " + resourceFileRequested);
+      throw new IOException("bad request");
+    }
+    return resourceFileRequested;
   }
 }

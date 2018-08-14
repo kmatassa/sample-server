@@ -162,6 +162,13 @@ public class AppTest {
     System.out.println("----------------------");    
     int rc = this.executeGet(HttpVersion.HTTP_1_1, "GET", "/foo.bar", false, "keep-alive");
     assertEquals("Should be BAD", HttpStatus.SC_NOT_FOUND, rc);
+  }  
+  
+  @Test
+  public void shouldFailWithBlockedSecurityCheck() throws Exception {
+    System.out.println("----------------------");    
+    int rc = this.executeGet(HttpVersion.HTTP_1_1, "GET", "/foo/../../../pom.xml", false, "keep-alive");
+    assertEquals("Should be BAD", HttpStatus.SC_BAD_REQUEST, rc);
   }
   
   @Test
