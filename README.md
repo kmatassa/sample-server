@@ -23,6 +23,13 @@ Assuming you have a maven client installed, it should be very simple:
 ```
 mvn test
 ```
+## Javadoc
+
+If desired, it will be produced in the /target/site/apidocs folder.
+
+```
+mvn javadoc:javadoc
+```
 
 This will run the sequence of maven targets up to and including test.  Items should be installed, code check-styled, compiled and finally
 test cases that start the http-server up and execute simplified fetches against it.

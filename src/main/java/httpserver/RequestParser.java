@@ -56,7 +56,7 @@ public class RequestParser {
    * Parses: "Method SP Request-URI SP HTTP-Version". Steals BasicLineParser.
    * @param in BufferedReader holding request content
    * @throws IOException sometimes
-   * @see https://hc.apache.org/httpcomponents-core-ga/httpcore
+   * {@link} https://hc.apache.org/httpcomponentxs-core-ga/httpcore
    */
   private void readRequestLine(final BufferedReader in) throws IOException {
     String line = in.readLine();
@@ -70,7 +70,7 @@ public class RequestParser {
    * Parses headers. Steals BasicLineParser.
    * @param in BufferedREader holding request content
    * @throws IOException sometimes
-   * @see https://hc.apache.org/httpcomponents-core-ga/httpcore
+   * {@link} https://hc.apache.org/httpcomponentxs-core-ga/httpcore
    */
   private void readRequestHeaders(final BufferedReader in) throws IOException {
     String line;
