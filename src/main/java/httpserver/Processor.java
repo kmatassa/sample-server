@@ -181,8 +181,9 @@ public class Processor {
     File dir = FileUtils.getFile(path, httpServerRoot);
     URI u = URI.create(uri);
 
-    // Security check for requested resource winding up above httpServerRoot.
+    // Grab the path component only
     File resourceFileRequested = FileUtils.getFile(dir, u.getPath());
+    // Security check for requested resource winding up above httpServerRoot.
     if (!resourceFileRequested.getCanonicalPath().startsWith(dir.getCanonicalPath())) {
       logger.warning("Suspicious request, skipping: " + resourceFileRequested);
       throw new IOException("bad request");
